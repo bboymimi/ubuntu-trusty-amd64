@@ -4,6 +4,16 @@
  * Internal slab definitions
  */
 
+#ifdef CONFIG_SLAB
+#include <linux/slab_def.h>
+#endif
+
+#ifdef CONFIG_SLUB
+#include <linux/slub_def.h>
+#endif
+
+#include <linux/memcontrol.h>
+
 /*
  * State of the slab allocator.
  *
