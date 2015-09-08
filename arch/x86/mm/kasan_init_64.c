@@ -26,7 +26,7 @@ static int __init map_range(struct range *range)
 	 * to slightly speed up fastpath. In some rare cases we could cross
 	 * boundary of mapped shadow, so we just map some more here.
 	 */
-	return vmemmap_populate(start, end + 1, NUMA_NO_NODE);
+	return vmemmap_populate(start, end + 1, 0);
 }
 
 static void __init clear_pgds(unsigned long start,
