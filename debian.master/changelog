@@ -1,3 +1,13 @@
+linux (3.13.0-65.105hf00093445v20160118b4h8d48886) trusty; urgency=low
+
+  [ Gavin Guo ]
+
+  * HOTFIX: Fix use-after-free bug in the task_numa_compare
+    - ESCALATION: #00093445
+    - LP: #1527643
+
+ -- Gavin Guo <gavin.guo@canonical.com>  Mon, 18 Jan 2016 22:54:50 +0800
+
 linux (3.13.0-65.105) trusty; urgency=low
 
   [ Brad Figg ]
