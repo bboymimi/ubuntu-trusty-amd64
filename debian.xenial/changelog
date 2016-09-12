@@ -1,3 +1,12 @@
+linux-lts-xenial (4.4.0-21.37~14.04.1hf00109996v20160912b0hb10913c2f0bb) trusty; urgency=medium
+
+  [ Gavin Guo ]
+
+  * HOTFIX: Enable KASAN
+    - ESCALATION: #00109996
+
+ -- Gavin Guo <gavin.guo@canonical.com>  Mon, 12 Sep 2016 21:15:56 +0800
+
 linux-lts-xenial (4.4.0-21.37~14.04.1) trusty; urgency=low
 
   [ Tim Gardner ]
