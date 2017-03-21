@@ -188,6 +188,8 @@ struct page * __meminit sparse_mem_map_populate(unsigned long pnum, int nid)
 	if (vmemmap_populate(start, end, nid))
 		return NULL;
 
+	printk(KERN_DEBUG "%s: pnum:%ld, start:%lx, end:%lx\n",
+	      __func__, pnum, start, end);
 	return map;
 }
 
