@@ -1,3 +1,9 @@
+linux (3.13.0-101.148hf00132717v20170321b0h29c6e04ce0ad) trusty; urgency=medium
+
+  * dump information on alloc/free memmap
+
+ -- Gavin Guo <gavin.guo@canonical.com>  Tue, 21 Mar 2017 18:53:33 +0800
+
 linux (3.13.0-101.148) trusty; urgency=low
 
   [ Seth Forshee ]
