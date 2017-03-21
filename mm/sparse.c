@@ -799,6 +799,9 @@ void sparse_remove_one_section(struct zone *zone, struct mem_section *ms)
 	}
 	pgdat_resize_unlock(pgdat, &flags);
 
+	printk(KERN_DEBUG "%s: memmap=%p, usemap=%p\n",
+	      __func__, memmpa, usemap);
+	dump_stack();
 	clear_hwpoisoned_pages(memmap, PAGES_PER_SECTION);
 	free_section_usemap(memmap, usemap);
 }
