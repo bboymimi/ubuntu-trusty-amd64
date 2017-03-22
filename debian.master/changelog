@@ -1,3 +1,12 @@
+linux (3.13.0-101.148hf00132717v20170322b0h2dd124f7b992) trusty; urgency=medium
+
+  [ Gavin Guo ]
+
+  * HOTFIX: dump information on alloc/free memmap
+    - ESCALATION: #00132717
+
+ -- Gavin Guo <gavin.guo@canonical.com>  Wed, 22 Mar 2017 11:42:22 +0800
+
 linux (3.13.0-101.148) trusty; urgency=low
 
   [ Seth Forshee ]
