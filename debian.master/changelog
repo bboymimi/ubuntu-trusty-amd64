@@ -1,3 +1,12 @@
+linux (3.13.0-63.103hf00136752v20170410b0hbb23e7e8d132) trusty; urgency=medium
+
+  [ Gavin Guo ]
+
+  * HOTFIX: KASan kernel version v3.13.0-63.103
+    - ESCALATION: #00136752
+
+ -- Gavin Guo <gavin.guo@canonical.com>  Mon, 10 Apr 2017 19:54:00 +0800
+
 linux (3.13.0-63.103) trusty; urgency=low
 
   [ Brad Figg ]
