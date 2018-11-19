@@ -230,6 +230,13 @@ x86_virt_spec_ctrl(u64 guest_spec_ctrl, u64 guest_virt_spec_ctrl, bool setguest)
 		guestval = hostval & ~x86_spec_ctrl_mask;
 		guestval |= guest_spec_ctrl & x86_spec_ctrl_mask;
 
+		/*
+		 * Check the host IBRS status to make IBRS regsiter update
+		 * correctly.
+		 */
+		if (ibrs_enabled)
+			hostval |= SPEC_CTRL_IBRS;
+
 		/* SSBD controlled in MSR_SPEC_CTRL */
 		if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD))
 			hostval |= ssbd_tif_to_spec_ctrl(ti->flags);

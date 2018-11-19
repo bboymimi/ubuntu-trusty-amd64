@@ -1579,6 +1579,32 @@ static void update_exception_bitmap(struct kvm_vcpu *vcpu)
 	vmcs_write32(EXCEPTION_BITMAP, eb);
 }
 
+/*
+ * Check if MSR is intercepted for currently loaded MSR bitmap.
+ */
+static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
+{
+	/*
+	 * The longmode_only = "false" for MSR_IA32_SPEC_CTRL MSR register in
+	 * vmx_init() function. So, the vmx_msr_bitmap_legacy bitmap is
+	 * used. Refer to vmx_disable_intercept_for_msr function for the detail.
+	 */
+	unsigned long *msr_bitmap = vmx_msr_bitmap_legacy;
+	int f = sizeof(unsigned long);
+
+	if (!cpu_has_vmx_msr_bitmap())
+		return true;
+
+	if (msr <= 0x1fff) {
+		return !!test_bit(msr, msr_bitmap + 0x800 / f);
+	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
+		msr &= 0x1fff;
+		return !!test_bit(msr, msr_bitmap + 0xc00 / f);
+	}
+
+	return true;
+}
+
 static void clear_atomic_switch_msr_special(unsigned long entry,
 		unsigned long exit)
 {
@@ -7626,6 +7652,17 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
 		, "eax", "ebx", "edi", "esi"
 #endif
 	      );
+
+	/*
+	 * In Ubuntu v3.13, the MSR_IA32_SPEC_CTRL trap is disabled in
+	 * vmx_init() function. The guest SPEC_CTRL register needs to be
+	 * saved to make the status correct. Refer to "commit 9ad95bf1c5da
+	 * x86/kvm: add MSR_IA32_SPEC_CTRL and MSR_IA32_PRED_CMD to kvm" The
+	 * related upstream commit is "commit 28b387fb74d KVM/VMX: Allow direct
+	 * access to MSR_IA32_SPEC_CTRL"
+	 */
+	if (!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL))
+		vcpu->arch.spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
 
 	x86_spec_ctrl_restore_host(vcpu->arch.spec_ctrl, 0);
 
