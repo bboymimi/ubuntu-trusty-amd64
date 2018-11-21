@@ -190,9 +190,11 @@
 # define THUNK_TARGET(addr) [thunk_target] "rm" (addr)
 #endif
 
-/* The IBPB and IBRS runtime control knobs */
+/* The IBPB runtime control knob */
 extern unsigned int ibpb_enabled;
-void ibpb_enable(void);
+int set_ibpb_enabled(unsigned int);
+
+/* The IBRS runtime control knob */
 extern unsigned int ibrs_enabled;
 void ibrs_enable(void);
 

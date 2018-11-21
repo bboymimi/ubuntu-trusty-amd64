@@ -428,19 +428,18 @@ retpoline_auto:
 	spectre_v2_enabled = mode;
 	pr_info("%s\n", spectre_v2_strings[mode]);
 
-	/* Initialize Indirect Branch Prediction Barrier if supported */
+	/*
+	 * Initialize Indirect Branch Prediction Barrier if supported and not
+	 * disabled on the commandline
+	 */
 	if (boot_cpu_has(X86_FEATURE_IBPB)) {
 		setup_force_cpu_cap(X86_FEATURE_USE_IBPB);
-
-		/*
-		 * Enable IBPB support if it's not turned off on the
-		 * commandline.
-		 */
-		if (!noibpb)
-			ibpb_enable();
-
-		pr_info("%s Indirect Branch Prediction Barrier\n",
-			ibpb_enabled ? "Enabling" : "Disabling");
+		if (noibpb) {
+			/* IBPB disabled via commandline */
+			set_ibpb_enabled(0);
+		} else {
+			set_ibpb_enabled(1);
+		}
 	}
 
 	/*
@@ -876,7 +875,7 @@ static ssize_t cpu_show_common(struct device *dev, struct device_attribute *attr
 
 	case X86_BUG_SPECTRE_V2:
 		return sprintf(buf, "%s%s%s\n", spectre_v2_strings[spectre_v2_enabled],
-			       ibpb_enabled && boot_cpu_has(X86_FEATURE_USE_IBPB) ? ", IBPB" : "",
+			       ibpb_enabled ? ", IBPB" : "",
 			       boot_cpu_has(X86_FEATURE_USE_IBRS_FW) ? ", IBRS_FW" : "");
 
 	case X86_BUG_SPEC_STORE_BYPASS:

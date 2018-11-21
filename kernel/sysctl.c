@@ -203,31 +203,37 @@ static int proc_dostring_coredump(struct ctl_table *table, int write,
 DEFINE_MUTEX(spec_ctrl_mutex);
 
 unsigned int ibpb_enabled = 0;
-EXPORT_SYMBOL(ibpb_enabled);
+EXPORT_SYMBOL(ibpb_enabled);   /* Required in some modules */
 
 static unsigned int __ibpb_enabled = 0;   /* procfs shadow variable */
 
-static void set_ibpb_enabled(unsigned int val)
+int set_ibpb_enabled(unsigned int val)
 {
+	int error = 0;
+
 	mutex_lock(&spec_ctrl_mutex);
 
 	/* Only enable IBPB if the CPU supports it */
-	if (val && boot_cpu_has(X86_FEATURE_USE_IBPB))
-		ibpb_enabled = 1;
-	else
+	if (boot_cpu_has(X86_FEATURE_IBPB)) {
+		ibpb_enabled = val;
+		pr_info("Spectre V2 : Spectre v2 mitigation: %s Indirect "
+			"Branch Prediction Barrier\n",
+			ibpb_enabled ? "Enabling" : "Disabling");
+	} else {
 		ibpb_enabled = 0;
+		if (val) {
+			/* IBPB is not supported but we try to turn it on */
+			error = -EINVAL;
+		}
+	}
 
 	/* Update the shadow variable */
 	__ibpb_enabled = ibpb_enabled;
 
 	mutex_unlock(&spec_ctrl_mutex);
-}
 
-inline void ibpb_enable(void)
-{
-	set_ibpb_enabled(1);
+	return error;
 }
-EXPORT_SYMBOL(ibpb_enable);
 
 static int ibpb_enabled_handler(struct ctl_table *table, int write,
 				void __user *buffer, size_t *lenp,
@@ -239,8 +245,7 @@ static int ibpb_enabled_handler(struct ctl_table *table, int write,
 	if (error)
 		return error;
 
-	set_ibpb_enabled(__ibpb_enabled);
-	return 0;
+	return set_ibpb_enabled(__ibpb_enabled);
 }
 
 unsigned int ibrs_enabled = 0;
