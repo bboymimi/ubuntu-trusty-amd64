@@ -429,6 +429,17 @@ retpoline_auto:
 	pr_info("%s\n", spectre_v2_strings[mode]);
 
 	/*
+	 * If spectre v2 protection has been enabled, unconditionally fill
+	 * RSB during a context switch; this protects against two independent
+	 * issues:
+	 *
+	 *	- RSB underflow (and switch to BTB) on Skylake+
+	 *	- SpectreRSB variant of spectre v2 on X86_BUG_SPECTRE_V2 CPUs
+	 */
+	setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+	pr_info("Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\n");
+
+	/*
 	 * Initialize Indirect Branch Prediction Barrier if supported and not
 	 * disabled on the commandline
 	 */
@@ -462,17 +473,6 @@ retpoline_auto:
 			set_ibrs_enabled(1);
 		}
 	}
-
-	/*
-	 * If spectre v2 protection has been enabled, unconditionally fill
-	 * RSB during a context switch; this protects against two independent
-	 * issues:
-	 *
-	 *	- RSB underflow (and switch to BTB) on Skylake+
-	 *	- SpectreRSB variant of spectre v2 on X86_BUG_SPECTRE_V2 CPUs
-	 */
-	setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
-	pr_info("Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\n");
 }
 
 #undef pr_fmt
