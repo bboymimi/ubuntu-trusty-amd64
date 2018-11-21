@@ -249,34 +249,45 @@ static int ibpb_enabled_handler(struct ctl_table *table, int write,
 }
 
 unsigned int ibrs_enabled = 0;
-EXPORT_SYMBOL(ibrs_enabled);
+EXPORT_SYMBOL(ibrs_enabled);   /* Required in some modules */
 
 static unsigned int __ibrs_enabled = 0;   /* procfs shadow variable */
 
-static void set_ibrs_enabled(unsigned int val)
+int set_ibrs_enabled(unsigned int val)
 {
 	unsigned int cpu;
 
 	mutex_lock(&spec_ctrl_mutex);
 
 	/* Only enable/disable IBRS if the CPU supports it */
-	if (boot_cpu_has(X86_FEATURE_USE_IBRS_FW)) {
+	if (boot_cpu_has(X86_FEATURE_IBRS)) {
 		ibrs_enabled = val;
+		pr_info("Spectre V2 : Spectre v2 mitigation: %s Indirect "
+			"Branch Restricted Speculation%s\n",
+			ibrs_enabled ? "Enabling" : "Disabling",
+			ibrs_enabled == 2 ? " (user space)" : "");
+
 		if (ibrs_enabled == 0) {
 			/* Always disable IBRS */
 			u64 val = x86_spec_ctrl_base;
 
-			for_each_online_cpu(cpu)
+			for_each_online_cpu(cpu) {
 				wrmsrl_on_cpu(cpu, MSR_IA32_SPEC_CTRL, val);
+			}
 		} else if (ibrs_enabled == 2) {
 			/* Always enable IBRS, even in user space */
 			u64 val = x86_spec_ctrl_base | SPEC_CTRL_IBRS;
 
-			for_each_online_cpu(cpu)
+			for_each_online_cpu(cpu) {
 				wrmsrl_on_cpu(cpu, MSR_IA32_SPEC_CTRL, val);
+			}
 		}
 	} else {
 		ibrs_enabled = 0;
+		if (val) {
+			/* IBRS is not supported but we try to turn it on */
+			error = -EINVAL;
+		}
 	}
 
 	/* Update the shadow variable */
@@ -285,25 +296,17 @@ static void set_ibrs_enabled(unsigned int val)
 	mutex_unlock(&spec_ctrl_mutex);
 }
 
-inline void ibrs_enable(void)
-{
-	set_ibrs_enabled(1);
-}
-EXPORT_SYMBOL(ibrs_enable);
-
 static int ibrs_enabled_handler(struct ctl_table *table, int write,
 				void __user *buffer, size_t *lenp,
 				loff_t *ppos)
 {
 	int error;
-	unsigned int cpu;
 
 	error = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
 	if (error)
 		return error;
 
-	set_ibrs_enabled(__ibrs_enabled);
-	return 0;
+	return set_ibrs_enabled(__ibrs_enabled);
 }
 #endif
 

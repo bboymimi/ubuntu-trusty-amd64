@@ -1625,13 +1625,13 @@ void native_play_dead(void)
 	play_dead_common();
 	tboot_shutdown(TB_SHUTDOWN_WFS);
 
-	restricted_branch_speculation_off();
+	ubuntu_restrict_branch_speculation_end();
 
 	mwait_play_dead();	/* Only returns on failure */
 	if (cpuidle_play_dead())
 		hlt_play_dead();
 
-	restricted_branch_speculation_on();
+	ubuntu_restrict_branch_speculation_start();
 }
 
 #else /* ... !CONFIG_HOTPLUG_CPU */

@@ -583,15 +583,15 @@ static void mwait_idle(void)
 			mb();
 		}
 
-		restricted_branch_speculation_off();
+		ubuntu_restrict_branch_speculation_end();
 
 		__monitor((void *)&current_thread_info()->flags, 0, 0);
 
 		if (!need_resched()) {
 			__sti_mwait(0, 0);
-			restricted_branch_speculation_on();
+			ubuntu_restrict_branch_speculation_start();
 		} else {
-			restricted_branch_speculation_on();
+			ubuntu_restrict_branch_speculation_start();
 			local_irq_enable();
 		}
 

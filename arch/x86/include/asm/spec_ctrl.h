@@ -21,11 +21,13 @@
 	popq %rdx;				\
 	popq %rcx;				\
 	popq %rax
+
 #define __ASM_ENABLE_IBRS_CLOBBER		\
 	movl $MSR_IA32_SPEC_CTRL, %ecx;		\
 	movl $0, %edx;				\
 	movl $SPEC_CTRL_IBRS, %eax;		\
 	wrmsr;
+
 #define __ASM_DISABLE_IBRS			\
 	pushq %rax;				\
 	pushq %rcx;				\
@@ -37,6 +39,7 @@
 	popq %rdx;				\
 	popq %rcx;				\
 	popq %rax
+
 #define __ASM_STUFF_RSB				\
 	call	1f;				\
 	pause;					\

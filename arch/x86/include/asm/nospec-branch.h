@@ -196,7 +196,7 @@ int set_ibpb_enabled(unsigned int);
 
 /* The IBRS runtime control knob */
 extern unsigned int ibrs_enabled;
-void ibrs_enable(void);
+int set_ibrs_enabled(unsigned int);
 
 /* The Spectre V2 mitigation variants */
 enum spectre_v2_mitigation {
@@ -266,7 +266,7 @@ do {									\
 	preempt_enable();						\
 } while (0)
 
-#define restricted_branch_speculation_on()				\
+#define ubuntu_restrict_branch_speculation_start()			\
 do {									\
 	u64 val = x86_spec_ctrl_base | SPEC_CTRL_IBRS;			\
 									\
@@ -274,7 +274,7 @@ do {									\
 		native_wrmsrl(MSR_IA32_SPEC_CTRL, val);			\
 } while (0)
 
-#define restricted_branch_speculation_off()				\
+#define ubuntu_restrict_branch_speculation_end()			\
 do {									\
 	u64 val = x86_spec_ctrl_base;					\
 									\
